@@ -15,8 +15,12 @@ public class VendingMachine {
     private PaymentMethod providedPaymentMethod;
 
     public VendingMachine(List<Inventory> initialInventories) {
+        if (initialInventories == null) {
+            throw new IllegalArgumentException("initialInventories cannot be null");
+        }
+
         idToInventory = new HashMap<>();
-        for (Inventory initialInventory: initialInventories) {
+        for (Inventory initialInventory : initialInventories) {
             idToInventory.put(initialInventory.getId(), initialInventory);
         }
     }
