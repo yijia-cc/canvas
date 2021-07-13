@@ -9,7 +9,7 @@ public class Inventory {
     private String label;
     private float price;
 
-    public Inventory(String id, String label,float price) {
+    public Inventory(String id, String label, float price) {
         this.id = id;
         this.label = label;
         this.price = price;

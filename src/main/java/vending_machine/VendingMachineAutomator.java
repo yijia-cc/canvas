@@ -5,13 +5,15 @@ import payment.PaymentMethod;
 import payment.UnauthorizedException;
 import ui.VendingMachineUI;
 
+import java.util.List;
+
 public class VendingMachineAutomator {
     private final VendingMachine vendingMachine;
     private final VendingMachineUI vendingMachineUI;
 
-    public VendingMachineAutomator(VendingMachineUI vendingMachineUI) {
+    public VendingMachineAutomator(VendingMachineUI vendingMachineUI, List<Inventory> initialInventories) {
         this.vendingMachineUI = vendingMachineUI;
-        this.vendingMachine = new VendingMachine();
+        this.vendingMachine = new VendingMachine(initialInventories);
     }
 
     public void run() {
