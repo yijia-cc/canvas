@@ -44,7 +44,10 @@ public class VendingMachine {
     }
 
     public void usePaymentMethod(PaymentMethod paymentMethod) throws UnauthorizedException, TimeoutException {
-        throw new UnsupportedOperationException();
+        if (!paymentMethod.isAuthorized()) {
+            throw new UnauthorizedException();
+        }
+        this.providedPaymentMethod = paymentMethod;
     }
 
     public Inventory selectInventory(String selectedInventoryId) {
