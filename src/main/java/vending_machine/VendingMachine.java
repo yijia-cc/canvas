@@ -2,6 +2,7 @@ package vending_machine;
 
 import payment.InsufficientFundException;
 import payment.PaymentMethod;
+import payment.TimeoutException;
 import payment.UnauthorizedException;
 
 import java.util.ArrayList;
@@ -42,15 +43,18 @@ public class VendingMachine {
         throw new UnsupportedOperationException();
     }
 
-    public void usePaymentMethod(PaymentMethod paymentMethod) {
-        throw new UnsupportedOperationException();
+    public void usePaymentMethod(PaymentMethod paymentMethod) throws UnauthorizedException, TimeoutException {
+        if (!paymentMethod.isAuthorized()) {
+            throw new UnauthorizedException();
+        }
+        this.providedPaymentMethod = paymentMethod;
     }
 
     public Inventory selectInventory(String selectedInventoryId) {
         throw new UnsupportedOperationException();
     }
 
-    public Item makePurchase() throws InsufficientFundException, UnauthorizedException {
+    public Item makePurchase() throws InsufficientFundException, TimeoutException {
         throw new UnsupportedOperationException();
     }
 
@@ -59,6 +63,10 @@ public class VendingMachine {
     }
 
     public void reset() {
+        throw new UnsupportedOperationException();
+    }
+
+    public PaymentMethod getPaymentMethod() {
         throw new UnsupportedOperationException();
     }
 }

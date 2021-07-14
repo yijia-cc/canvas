@@ -2,7 +2,8 @@ package vending_machine;
 
 import payment.InsufficientFundException;
 import payment.PaymentMethod;
-import payment.UnauthorizedException;
+import payment.TimeoutException;
+import retry.RetryStrategy;
 import ui.VendingMachineUI;
 
 import java.util.List;
@@ -17,7 +18,6 @@ public class VendingMachineAutomator {
     }
 
     public void run() {
-
         /**
          * Requirements:
          * 1. user purchase items multiple times
@@ -32,10 +32,18 @@ public class VendingMachineAutomator {
         // process multiple transactions
         while (true) {
             vendingMachineUI.displayInventories(vendingMachine.listInventories());
-            PaymentMethod paymentMethod = vendingMachineUI.requestPaymentMethod();
-            vendingMachine.usePaymentMethod(paymentMethod);
+
+            boolean succeed = RetryStrategy.instant(()->{
+                PaymentMethod paymentMethod = vendingMachineUI.requestPaymentMethod();
+                vendingMachine.usePaymentMethod(paymentMethod);
+            }, 3);
+            if (!succeed) {
+                cancelTransaction();
+                continue;
+            }
 
             String inventoryId = vendingMachineUI.requestInventoryId();
+
             Inventory selectedInventory = vendingMachine.selectInventory(inventoryId);
             vendingMachineUI.displaySelectedInventory(selectedInventory);
 
@@ -43,15 +51,20 @@ public class VendingMachineAutomator {
 
             try {
                 item = vendingMachine.makePurchase();
-            } catch (InsufficientFundException | UnauthorizedException e) {
+            } catch (InsufficientFundException | TimeoutException e) {
                 vendingMachineUI.displayPaymentError(e);
-                vendingMachine.cancel();
+                cancelTransaction();
                 continue;
             }
 
             vendingMachineUI.displayPurchasedItem(item);
-            vendingMachineUI.issueChange(paymentMethod);
+            vendingMachineUI.issueChange(vendingMachine.getPaymentMethod());
             vendingMachine.reset();
         }
+    }
+
+    private void cancelTransaction() {
+        vendingMachineUI.displayCancel();
+        vendingMachine.cancel();
     }
 }
