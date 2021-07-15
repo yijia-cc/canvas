@@ -7,6 +7,7 @@ import retry.RetryStrategy;
 import ui.VendingMachineUI;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class VendingMachineAutomator {
     private static final int PAYMENT_RETRY_LIMIT = 3;
@@ -45,16 +46,18 @@ public class VendingMachineAutomator {
                 continue;
             }
 
+            AtomicReference<Inventory> inventory = new AtomicReference<>();
+
             succeed = RetryStrategy.instant(()->{
                 String inventoryId = vendingMachineUI.requestInventoryId();
-                vendingMachine.selectInventory(inventoryId);
+                inventory.set(vendingMachine.selectInventory(inventoryId));
             }, INVENTORY_ID_RETRY_LIMIT);
             if (!succeed) {
                 cancelTransaction();
                 continue;
             }
 
-            vendingMachineUI.displaySelectedInventory(vendingMachine.getSelectedInventory());
+            vendingMachineUI.displaySelectedInventory(inventory.get());
 
             Item item;
             try {
