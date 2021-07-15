@@ -54,5 +54,10 @@ public class VendingMachineTerminalUI implements VendingMachineUI {
     public void issueChange(PaymentMethod paymentMethod) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void displayCancel() {
+
+    }
 }
 

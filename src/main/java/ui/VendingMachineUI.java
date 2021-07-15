@@ -20,4 +20,6 @@ public interface VendingMachineUI {
     void displayPurchasedItem(Item selectedInventory);
 
     void issueChange(PaymentMethod paymentMethod);
+
+    void displayCancel();
 }
