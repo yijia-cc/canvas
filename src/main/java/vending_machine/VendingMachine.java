@@ -58,13 +58,13 @@ public class VendingMachine {
         throw new UnsupportedOperationException();
     }
 
-    public void cancel() {
+    public void cancelTransaction() {
         selectedInventory = null;
         providedPaymentMethod = null;
     }
 
-    public void reset() {
-        throw new UnsupportedOperationException();
+    public void finishTransaction() {
+        cancelTransaction();
     }
 
     public PaymentMethod getPaymentMethod() {

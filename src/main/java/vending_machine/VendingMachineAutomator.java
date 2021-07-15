@@ -7,6 +7,7 @@ import retry.RetryStrategy;
 import ui.VendingMachineUI;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class VendingMachineAutomator {
     private final VendingMachine vendingMachine;
@@ -33,9 +34,10 @@ public class VendingMachineAutomator {
         while (true) {
             vendingMachineUI.displayInventories(vendingMachine.listInventories());
 
-            boolean succeed = RetryStrategy.instant(()->{
-                PaymentMethod paymentMethod = vendingMachineUI.requestPaymentMethod();
-                vendingMachine.usePaymentMethod(paymentMethod);
+            AtomicReference<PaymentMethod> paymentMethod = new AtomicReference<>();
+            boolean succeed = RetryStrategy.instant(() -> {
+                paymentMethod.set(vendingMachineUI.requestPaymentMethod());
+                vendingMachine.usePaymentMethod(paymentMethod.get());
             }, 3);
             if (!succeed) {
                 cancelTransaction();
@@ -59,12 +61,12 @@ public class VendingMachineAutomator {
 
             vendingMachineUI.displayPurchasedItem(item);
             vendingMachineUI.issueChange(vendingMachine.getPaymentMethod());
-            vendingMachine.reset();
+            vendingMachine.finishTransaction();
         }
     }
 
     private void cancelTransaction() {
         vendingMachineUI.displayCancel();
-        vendingMachine.cancel();
+        vendingMachine.cancelTransaction();
     }
 }
