@@ -37,7 +37,7 @@ public class VendingMachineAutomator {
         while (true) {
             vendingMachineUI.displayInventories(vendingMachine.listInventories());
 
-            boolean succeed = RetryStrategy.instant(()->{
+            boolean succeed = RetryStrategy.instant(() -> {
                 PaymentMethod paymentMethod = vendingMachineUI.requestPaymentMethod();
                 vendingMachine.usePaymentMethod(paymentMethod);
             }, PAYMENT_RETRY_LIMIT);
@@ -70,12 +70,12 @@ public class VendingMachineAutomator {
 
             vendingMachineUI.displayPurchasedItem(item);
             vendingMachineUI.issueChange(vendingMachine.getPaymentMethod());
-            vendingMachine.reset();
+            vendingMachine.finishTransaction();
         }
     }
 
     private void cancelTransaction() {
         vendingMachineUI.displayCancel();
-        vendingMachine.cancel();
+        vendingMachine.cancelTransaction();
     }
 }
