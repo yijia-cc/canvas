@@ -1,9 +1,6 @@
 package vending_machine;
 
-import payment.InsufficientFundException;
-import payment.PaymentMethod;
-import payment.TimeoutException;
-import payment.UnauthorizedException;
+import payment.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,8 +47,11 @@ public class VendingMachine {
         this.providedPaymentMethod = paymentMethod;
     }
 
-    public Inventory selectInventory(String selectedInventoryId) {
-        throw new UnsupportedOperationException();
+    public void selectInventory(String selectedInventoryId) throws InvalidInventoryIdException {
+        if (!idToInventory.containsKey(selectedInventoryId)) {
+            throw new InvalidInventoryIdException();
+        }
+        this.selectedInventory = idToInventory.get(selectedInventoryId);
     }
 
     public Item makePurchase() throws InsufficientFundException, TimeoutException {
@@ -67,6 +67,10 @@ public class VendingMachine {
     }
 
     public PaymentMethod getPaymentMethod() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Inventory getSelectedInventory() {
         throw new UnsupportedOperationException();
     }
 }
