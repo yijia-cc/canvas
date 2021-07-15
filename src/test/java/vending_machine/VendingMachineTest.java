@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import payment.InvalidInventoryIdException;
 import payment.PaymentMethod;
 import payment.TimeoutException;
 import payment.UnauthorizedException;
@@ -88,6 +89,30 @@ public class VendingMachineTest {
                         null));
     }
 
+    private static Stream<Arguments> selectInventoryProvider() {
+        return Stream.of(
+                arguments("No inventory",
+                        new ArrayList<>() {},
+                        "004",
+                        InvalidInventoryIdException.class),
+                arguments("Fail to Select Inventory",
+                        new ArrayList<>() {{
+                            new Inventory("001", "Coke", 3);
+                            new Inventory("002", "Pepsi", 3);
+                            new Inventory("003", "Kind", 2);
+                        }},
+                        "004",
+                        InvalidInventoryIdException.class),
+                arguments("Succeed to Select Inventory",
+                        new ArrayList<>() {{
+                            new Inventory("001", "Coke", 3);
+                            new Inventory("002", "Pepsi", 3);
+                            new Inventory("003", "Kind", 2);
+                        }},
+                        "001",
+                        null));
+    }
+
 
     @ParameterizedTest(name = "{displayName} : {0}")
     @MethodSource("simpleConstructorProvider")
@@ -108,7 +133,6 @@ public class VendingMachineTest {
         VendingMachine vendingMachine = new VendingMachine(inputInventories);
         List<Inventory> actualInventories = vendingMachine.listInventories();
         assertSameElements(expectedInventories, actualInventories, testCaseName);
-
     }
 
     @ParameterizedTest(name = "{displayName} : {0}")
@@ -143,6 +167,27 @@ public class VendingMachineTest {
         } else {
             assertThrows(expectedException, () -> {
                 vendingMachine.usePaymentMethod(stubPaymentMethod);
+            });
+        }
+    }
+
+    @ParameterizedTest(name = "{displayName} : {0}")
+    @MethodSource("selectInventoryProvider")
+    public void selectInventoryTest(
+            String testCaseName,
+            List<Inventory> inputInventories,
+            String selectedInventoryId,
+            Class<? extends Exception> expectedException
+    ) {
+        VendingMachine vendingMachine = new VendingMachine(inputInventories);
+        if (expectedException == null) {
+            try {
+                vendingMachine.selectInventory(selectedInventoryId);
+            } catch (Exception ignore) {
+            }
+        } else {
+            assertThrows(expectedException, () -> {
+                vendingMachine.selectInventory(selectedInventoryId);
             });
         }
     }
