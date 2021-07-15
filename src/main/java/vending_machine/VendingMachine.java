@@ -59,7 +59,8 @@ public class VendingMachine {
     }
 
     public void cancel() {
-        throw new UnsupportedOperationException();
+        selectedInventory = null;
+        providedPaymentMethod = null;
     }
 
     public void reset() {
