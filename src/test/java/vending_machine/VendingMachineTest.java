@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import payment.InvalidInventoryIdException;
 import payment.PaymentMethod;
 import payment.TimeoutException;
 import payment.UnauthorizedException;
@@ -14,8 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.when;
 import static tools.Assertions.assertSameElements;
@@ -32,14 +32,14 @@ public class VendingMachineTest {
                 arguments(
                         "Has Inventories",
                         new ArrayList<>() {{
-                            new Inventory("001", "Coke", 3);
-                            new Inventory("002", "Pepsi", 3);
-                            new Inventory("003", "Kind", 2);
+                            add(new Inventory("001", "Coke", 3));
+                            add(new Inventory("002", "Pepsi", 3));
+                            add(new Inventory("003", "Kind", 2));
                         }},
                         new ArrayList<>() {{
-                            new Inventory("002", "Pepsi", 3);
-                            new Inventory("001", "Coke", 3);
-                            new Inventory("003", "Kind", 2);
+                            add(new Inventory("001", "Coke", 3));
+                            add(new Inventory("002", "Pepsi", 3));
+                            add(new Inventory("003", "Kind", 2));
                         }}));
     }
 
@@ -50,9 +50,9 @@ public class VendingMachineTest {
                 arguments(
                         "Has Inventories",
                         new ArrayList<>() {{
-                            new Inventory("001", "Coke", 3);
-                            new Inventory("002", "Pepsi", 3);
-                            new Inventory("003", "Kind", 2);
+                            add(new Inventory("001", "Coke", 3));
+                            add(new Inventory("002", "Pepsi", 3));
+                            add(new Inventory("003", "Kind", 2));
                         }},
                         null)
         );
@@ -60,18 +60,20 @@ public class VendingMachineTest {
 
     private static Stream<Arguments> usePaymentProvider() {
         return Stream.of(
-                arguments("Unauthorized", new ArrayList<>() {{
-                            new Inventory("001", "Coke", 3);
-                            new Inventory("002", "Pepsi", 3);
-                            new Inventory("003", "Kind", 2);
+                arguments("Unauthorized",
+                        new ArrayList<>() {{
+                            add(new Inventory("001", "Coke", 3));
+                            add(new Inventory("002", "Pepsi", 3));
+                            add(new Inventory("003", "Kind", 2));
                         }},
                         false,
                         null,
                         UnauthorizedException.class),
-                arguments("Authorization timeout", new ArrayList<>() {{
-                            new Inventory("001", "Coke", 3);
-                            new Inventory("002", "Pepsi", 3);
-                            new Inventory("003", "Kind", 2);
+                arguments("Authorization timeout",
+                        new ArrayList<>() {{
+                            add(new Inventory("001", "Coke", 3));
+                            add(new Inventory("002", "Pepsi", 3));
+                            add(new Inventory("003", "Kind", 2));
                         }},
                         false,
                         TimeoutException.class,
@@ -79,13 +81,40 @@ public class VendingMachineTest {
                 arguments(
                         "Authorized",
                         new ArrayList<>() {{
-                            new Inventory("001", "Coke", 3);
-                            new Inventory("002", "Pepsi", 3);
-                            new Inventory("003", "Kind", 2);
+                            add(new Inventory("001", "Coke", 3));
+                            add(new Inventory("002", "Pepsi", 3));
+                            add(new Inventory("003", "Kind", 2));
                         }},
                         true,
                         null,
                         null));
+    }
+
+    private static Stream<Arguments> selectInventoryProvider() {
+        return Stream.of(
+                arguments("No inventory",
+                        new ArrayList<>() {},
+                        "004",
+                        InvalidInventoryIdException.class,
+                        null),
+                arguments("Inventory ID not found",
+                        new ArrayList<>() {{
+                            add(new Inventory("001", "Coke", 3));
+                            add(new Inventory("002", "Pepsi", 3));
+                            add(new Inventory("003", "Kind", 2));
+                        }},
+                        "004",
+                        InvalidInventoryIdException.class,
+                        null),
+                arguments("Inventory ID found",
+                        new ArrayList<>() {{
+                            add(new Inventory("001", "Coke", 3));
+                            add(new Inventory("002", "Pepsi", 3));
+                            add(new Inventory("003", "Kind", 2));
+                        }},
+                        "001",
+                        null,
+                        new Inventory("001", "Coke", 3)));
     }
 
 
@@ -108,7 +137,6 @@ public class VendingMachineTest {
         VendingMachine vendingMachine = new VendingMachine(inputInventories);
         List<Inventory> actualInventories = vendingMachine.listInventories();
         assertSameElements(expectedInventories, actualInventories, testCaseName);
-
     }
 
     @ParameterizedTest(name = "{displayName} : {0}")
@@ -139,10 +167,34 @@ public class VendingMachineTest {
             } catch (Exception e) {
                 fail(e);
             }
-
         } else {
             assertThrows(expectedException, () -> {
                 vendingMachine.usePaymentMethod(stubPaymentMethod);
+            });
+        }
+    }
+
+    @ParameterizedTest(name = "{displayName} : {0}")
+    @MethodSource("selectInventoryProvider")
+    public void selectInventoryTest(
+            String testCaseName,
+            List<Inventory> inputInventories,
+            String selectedInventoryId,
+            Class<? extends Exception> expectedException,
+            Inventory expectedInventory
+    ) {
+        VendingMachine vendingMachine = new VendingMachine(inputInventories);
+        if (expectedException == null) {
+            Inventory selectedInventory = null;
+            try {
+                selectedInventory = vendingMachine.selectInventory(selectedInventoryId);
+            } catch (Exception e) {
+                fail(e);
+            }
+            assertEquals(expectedInventory, selectedInventory);
+        } else {
+            assertThrows(expectedException, () -> {
+                vendingMachine.selectInventory(selectedInventoryId);
             });
         }
     }
