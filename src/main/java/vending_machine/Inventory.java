@@ -1,24 +1,34 @@
 package vending_machine;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.Objects;
+import exceptions.InsufficientInventoryException;
+
+import java.util.*;
 
 public class Inventory {
     private final String id;
-    private final Deque<Item> inventory = new ArrayDeque<>();
+    private final Deque<Item> items = new ArrayDeque<>();
     private String label;
     private float price;
 
     public Inventory(String id, String label, float price) {
+        this(id, label, price, new ArrayList<>());
+    }
+
+    public Inventory(String id, String label, float price, List<Item> itemList) {
         if (id == null) {
             throw new IllegalArgumentException("id cannot be null");
+        }
+
+        if (itemList == null) {
+            throw new IllegalArgumentException("items cannot be null");
         }
 
         this.id = id;
         this.label = label;
         this.price = price;
+        for (Item item : itemList) {
+            this.items.offerFirst(item);
+        }
     }
 
     public String getId() {
@@ -45,8 +55,16 @@ public class Inventory {
         throw new UnsupportedOperationException();
     }
 
-    public void removeItem() {
-        throw new UnsupportedOperationException();
+    public Item removeItem() throws InsufficientInventoryException {
+        if (items.isEmpty()) {
+            throw new InsufficientInventoryException();
+        }
+        return items.pollFirst();
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
     @Override
@@ -56,12 +74,7 @@ public class Inventory {
         Inventory inventory1 = (Inventory) o;
         return inventory1.price == price &&
                 id.equals(inventory1.id) &&
-                Arrays.equals(inventory.toArray(), inventory1.inventory.toArray()) &&
+                Arrays.equals(items.toArray(), inventory1.items.toArray()) &&
                 Objects.equals(label, inventory1.label);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
     }
 }

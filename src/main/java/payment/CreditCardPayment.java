@@ -1,9 +1,12 @@
 package payment;
 
-public class CreditCardPayment implements PaymentMethod{
+import exceptions.InsufficientFundException;
+import exceptions.PaymentTimeoutException;
+
+public class CreditCardPayment implements PaymentMethod {
 
     @Override
-    public boolean isAuthorized() throws TimeoutException {
+    public boolean isAuthorized() throws PaymentTimeoutException {
         throw new UnsupportedOperationException();
     }
 
