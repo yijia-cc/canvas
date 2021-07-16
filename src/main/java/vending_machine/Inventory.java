@@ -27,7 +27,7 @@ public class Inventory {
         this.label = label;
         this.price = price;
         for (Item item : itemList) {
-            this.items.addFirst(item);
+            this.items.offerFirst(item);
         }
     }
 
@@ -59,7 +59,7 @@ public class Inventory {
         if (items.isEmpty()) {
             throw new InsufficientInventoryException();
         }
-        return items.pop();
+        return items.pollFirst();
     }
 
     @Override
