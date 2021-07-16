@@ -1,6 +1,7 @@
 package vending_machine;
 
-import payment.*;
+import exceptions.*;
+import payment.PaymentMethod;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class VendingMachine {
     /**
      * List all the inventories in the vending machine.
      * Each inventory contains a list of items which users can purchase.
+     *
      * @return All inventories in the vending machine.
      */
     public List<Inventory> listInventories() {
@@ -40,7 +42,7 @@ public class VendingMachine {
         throw new UnsupportedOperationException();
     }
 
-    public void usePaymentMethod(PaymentMethod paymentMethod) throws UnauthorizedException, TimeoutException {
+    public void usePaymentMethod(PaymentMethod paymentMethod) throws UnauthorizedException, PaymentTimeoutException {
         if (!paymentMethod.isAuthorized()) {
             throw new UnauthorizedException();
         }
@@ -55,17 +57,29 @@ public class VendingMachine {
         return selectedInventory;
     }
 
-    public Item makePurchase() throws InsufficientFundException, TimeoutException {
-        throw new UnsupportedOperationException();
+    public Item makePurchase() throws
+            InsufficientFundException,
+            PaymentTimeoutException,
+            InsufficientInventoryException,
+            NoInventorySelectedException,
+            NoPaymentMethodException {
+        if (selectedInventory == null) {
+            throw new NoInventorySelectedException();
+        }
+        if (providedPaymentMethod == null) {
+            throw new NoPaymentMethodException();
+        }
+        providedPaymentMethod.pay(selectedInventory.getPrice());
+        return selectedInventory.removeItem();
+    }
+
+    public void finishTransaction() {
+        cancelTransaction();
     }
 
     public void cancelTransaction() {
         selectedInventory = null;
         providedPaymentMethod = null;
-    }
-
-    public void finishTransaction() {
-        cancelTransaction();
     }
 
     public PaymentMethod getPaymentMethod() {

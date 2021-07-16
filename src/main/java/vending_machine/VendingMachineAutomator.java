@@ -1,8 +1,7 @@
 package vending_machine;
 
-import payment.InsufficientFundException;
+import exceptions.*;
 import payment.PaymentMethod;
-import payment.TimeoutException;
 import retry.RetryStrategy;
 import ui.VendingMachineUI;
 
@@ -48,7 +47,7 @@ public class VendingMachineAutomator {
 
             AtomicReference<Inventory> inventory = new AtomicReference<>();
 
-            succeed = RetryStrategy.instant(()->{
+            succeed = RetryStrategy.instant(() -> {
                 String inventoryId = vendingMachineUI.requestInventoryId();
                 inventory.set(vendingMachine.selectInventory(inventoryId));
             }, INVENTORY_ID_RETRY_LIMIT);
@@ -62,7 +61,11 @@ public class VendingMachineAutomator {
             Item item;
             try {
                 item = vendingMachine.makePurchase();
-            } catch (InsufficientFundException | TimeoutException e) {
+            } catch (InsufficientFundException |
+                    PaymentTimeoutException |
+                    InsufficientInventoryException |
+                    NoInventorySelectedException |
+                    NoPaymentMethodException e) {
                 vendingMachineUI.displayPaymentError(e);
                 cancelTransaction();
                 continue;
