@@ -11,13 +11,14 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import payment.PaymentMethod;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.ArgumentMatchers.anyFloat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static tools.Assertions.assertSameElements;
 
@@ -151,10 +152,10 @@ public class VendingMachineTest {
                     .thenReturn(true);
 
             if (paymentMethodPayException == null) {
-                when(stubPaymentMethod.pay(anyFloat()))
+                when(stubPaymentMethod.pay(any()))
                         .thenReturn(true);
             } else {
-                when(stubPaymentMethod.pay(anyFloat()))
+                when(stubPaymentMethod.pay(any()))
                         .thenThrow(paymentMethodPayException);
             }
         } catch (Exception e) {
@@ -186,14 +187,14 @@ public class VendingMachineTest {
                 arguments(
                         "Has Inventories",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }}));
     }
 
@@ -204,9 +205,9 @@ public class VendingMachineTest {
                 arguments(
                         "Has Inventories",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         null)
         );
@@ -216,18 +217,18 @@ public class VendingMachineTest {
         return Stream.of(
                 arguments("Unauthorized",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         false,
                         null,
                         UnauthorizedException.class),
                 arguments("Authorization timeout",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         false,
                         PaymentTimeoutException.class,
@@ -235,9 +236,9 @@ public class VendingMachineTest {
                 arguments(
                         "Authorized",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         true,
                         null,
@@ -254,22 +255,22 @@ public class VendingMachineTest {
                         null),
                 arguments("Inventory ID not found",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         "004",
                         InvalidInventoryIdException.class,
                         null),
                 arguments("Inventory ID found",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         "001",
                         null,
-                        new Inventory("001", "Coke", 3)));
+                        new Inventory("001", "Coke", new BigDecimal("3"))));
     }
 
     private static Stream<Arguments> purchaseProvider() {
@@ -277,9 +278,9 @@ public class VendingMachineTest {
                 arguments(
                         "No payment method provided",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         "003",
                         false,
@@ -290,9 +291,9 @@ public class VendingMachineTest {
                 arguments(
                         "No inventory selected",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }} /* inputInventories */,
                         null /* inventoryId */,
                         true /* usePaymentMethod */,
@@ -302,9 +303,9 @@ public class VendingMachineTest {
                 arguments(
                         "Inventory out of stock",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         "001",
                         true,
@@ -314,9 +315,9 @@ public class VendingMachineTest {
                 arguments(
                         "Insufficient fund for item",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         "001",
                         true,
@@ -327,9 +328,9 @@ public class VendingMachineTest {
                 arguments(
                         "Payment time out",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3")));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         "001",
                         true,
@@ -340,13 +341,13 @@ public class VendingMachineTest {
                 arguments(
                         "Purchase item successfully",
                         new ArrayList<>() {{
-                            add(new Inventory("001", "Coke", 3));
-                            add(new Inventory("002", "Pepsi", 3,
+                            add(new Inventory("001", "Coke", new BigDecimal("3")));
+                            add(new Inventory("002", "Pepsi", new BigDecimal("3"),
                                     new ArrayList<>() {{
                                         add(new Item(1, "PepsiZeroSugar"));
                                         add(new Item(2, "PepsiZeroSugar"));
                                     }}));
-                            add(new Inventory("003", "Kind", 2));
+                            add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         "002",
                         true,

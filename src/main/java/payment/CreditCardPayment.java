@@ -3,6 +3,8 @@ package payment;
 import exceptions.InsufficientFundException;
 import exceptions.PaymentTimeoutException;
 
+import java.math.BigDecimal;
+
 public class CreditCardPayment implements PaymentMethod {
 
     @Override
@@ -11,7 +13,7 @@ public class CreditCardPayment implements PaymentMethod {
     }
 
     @Override
-    public boolean pay(float amount) throws InsufficientFundException {
+    public boolean pay(BigDecimal totalAmountToPay) throws InsufficientFundException {
         return false;
     }
 }

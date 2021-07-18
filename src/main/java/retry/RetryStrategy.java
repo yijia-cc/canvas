@@ -6,6 +6,8 @@ public class RetryStrategy {
             try {
                 callBack.execute();
                 return true;
+            } catch (InterruptedException e) {
+                return false;
             } catch (Exception ignore) {
             }
         }

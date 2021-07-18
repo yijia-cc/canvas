@@ -1,5 +1,6 @@
 package ui;
 
+import exceptions.NoPaymentMethodException;
 import payment.PaymentMethod;
 import vending_machine.Inventory;
 import vending_machine.Item;
@@ -19,7 +20,7 @@ public interface VendingMachineUI {
 
     void displayPurchasedItem(Item selectedInventory);
 
-    void issueChange(PaymentMethod paymentMethod);
+    void finishPayment() throws NoPaymentMethodException;
 
     void displayCancel();
 }

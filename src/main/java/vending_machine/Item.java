@@ -5,7 +5,7 @@ import java.util.Objects;
 public class Item {
 
     private final int id;
-    private String name;
+    private final String name;
 
 
     Item(int id, String name) {
