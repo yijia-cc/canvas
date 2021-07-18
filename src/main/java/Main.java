@@ -1,3 +1,4 @@
+import exceptions.NoPaymentMethodException;
 import ui.VendingMachineUI;
 import ui.terminal.VendingMachineTerminalUI;
 import vending_machine.Inventory;
@@ -7,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoPaymentMethodException {
         VendingMachineUI vendingMachineUI = new VendingMachineTerminalUI();
         List<Inventory> inventories = new ArrayList<>();
         VendingMachineAutomator vendingMachineAutomator = new VendingMachineAutomator(vendingMachineUI, inventories);

@@ -6,6 +6,7 @@ import retry.RetryStrategy;
 import ui.VendingMachineUI;
 
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VendingMachineAutomator {
@@ -20,7 +21,7 @@ public class VendingMachineAutomator {
         this.vendingMachine = new VendingMachine(initialInventories);
     }
 
-    public void run() {
+    public void run() throws NoPaymentMethodException {
         /**
          * Requirements:
          * 1. user purchase items multiple times
@@ -37,7 +38,13 @@ public class VendingMachineAutomator {
             vendingMachineUI.displayInventories(vendingMachine.listInventories());
 
             boolean succeed = RetryStrategy.instant(() -> {
-                PaymentMethod paymentMethod = vendingMachineUI.requestPaymentMethod();
+                PaymentMethod paymentMethod;
+                try {
+                    paymentMethod = vendingMachineUI.requestPaymentMethod();
+                } catch (CancellationException e) {
+                    throw new InterruptedException();
+                }
+
                 vendingMachine.usePaymentMethod(paymentMethod);
             }, PAYMENT_RETRY_LIMIT);
             if (!succeed) {
@@ -72,7 +79,7 @@ public class VendingMachineAutomator {
             }
 
             vendingMachineUI.displayPurchasedItem(item);
-            vendingMachineUI.issueChange(vendingMachine.getPaymentMethod());
+            vendingMachineUI.finishPayment();
             vendingMachine.finishTransaction();
         }
     }

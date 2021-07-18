@@ -2,19 +2,20 @@ package vending_machine;
 
 import exceptions.InsufficientInventoryException;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class Inventory {
     private final String id;
     private final Deque<Item> items = new ArrayDeque<>();
     private String label;
-    private float price;
+    private BigDecimal price;
 
-    public Inventory(String id, String label, float price) {
+    public Inventory(String id, String label, BigDecimal price) {
         this(id, label, price, new ArrayList<>());
     }
 
-    public Inventory(String id, String label, float price, List<Item> itemList) {
+    public Inventory(String id, String label, BigDecimal price, List<Item> itemList) {
         if (id == null) {
             throw new IllegalArgumentException("id cannot be null");
         }
@@ -35,11 +36,11 @@ public class Inventory {
         return id;
     }
 
-    public float getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -72,7 +73,7 @@ public class Inventory {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Inventory inventory1 = (Inventory) o;
-        return inventory1.price == price &&
+        return Objects.equals(inventory1.price, price) &&
                 id.equals(inventory1.id) &&
                 Arrays.equals(items.toArray(), inventory1.items.toArray()) &&
                 Objects.equals(label, inventory1.label);

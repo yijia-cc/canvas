@@ -83,6 +83,6 @@ public class VendingMachine {
     }
 
     public PaymentMethod getPaymentMethod() {
-        throw new UnsupportedOperationException();
+        return providedPaymentMethod;
     }
 }
