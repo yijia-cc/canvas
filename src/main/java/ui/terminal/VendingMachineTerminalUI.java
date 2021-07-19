@@ -64,7 +64,7 @@ public class VendingMachineTerminalUI implements VendingMachineUI {
     }
 
     @Override
-    public void displayPaymentError(Exception e) {
+    public void displayPurchaseError(Exception e) {
         throw new UnsupportedOperationException();
     }
 

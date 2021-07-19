@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 public class VendingMachine {
     private final Map<String, Inventory> idToInventory;
@@ -42,7 +43,7 @@ public class VendingMachine {
         throw new UnsupportedOperationException();
     }
 
-    public void usePaymentMethod(PaymentMethod paymentMethod) throws UnauthorizedException, PaymentTimeoutException {
+    public void usePaymentMethod(PaymentMethod paymentMethod) throws UnauthorizedException, TimeoutException {
         if (!paymentMethod.isAuthorized()) {
             throw new UnauthorizedException();
         }
@@ -59,7 +60,7 @@ public class VendingMachine {
 
     public Item makePurchase() throws
             InsufficientFundException,
-            PaymentTimeoutException,
+            TimeoutException,
             InsufficientInventoryException,
             NoInventorySelectedException,
             NoPaymentMethodException {

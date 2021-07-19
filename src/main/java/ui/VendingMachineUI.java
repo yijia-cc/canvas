@@ -16,7 +16,7 @@ public interface VendingMachineUI {
 
     void displaySelectedInventory(Inventory selectedInventory);
 
-    void displayPaymentError(Exception e);
+    void displayPurchaseError(Exception e);
 
     void displayPurchasedItem(Item selectedInventory);
 

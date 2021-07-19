@@ -1,4 +1,4 @@
-package payment.cash;
+package cash;
 
 import java.math.BigDecimal;
 
