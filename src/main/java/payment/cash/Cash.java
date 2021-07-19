@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
-public class Cash {
+import static util.Util.areCloseEnough;
 
-    private final Denomination[] denominations = new Denomination[]{
+public class Cash {
+    private static final BigDecimal ONE_CENT = new BigDecimal("0.01");
+    private static final Denomination[] denominations = new Denomination[]{
             Note.HUNDRED,
             Note.FIFTY,
             Note.TWENTY,
@@ -21,8 +23,6 @@ public class Cash {
             Coin.PENNY
     };
     private final Map<Denomination, Integer> cash = new HashMap<>();
-    private int minNotesAndCoins = Integer.MAX_VALUE;
-    private List<Integer> minCashCounts = new ArrayList<>();
 
     Cash(BigDecimal amount) {
         if (amount.compareTo(new BigDecimal(0)) < 0) {
@@ -30,12 +30,11 @@ public class Cash {
         }
 
         initCash(amount);
-        for (int i = 0; i < minCashCounts.size(); i++) {
-            if (minCashCounts.get(i) == 0) {
-                continue;
-            }
-            cash.put(denominations[i], minCashCounts.get(i));
-        }
+
+    }
+
+    Cash(Map<Denomination, Integer> cash) {
+        this.cash.putAll(cash);
     }
 
     public void addCash(Denomination denomination, int count) {
@@ -75,10 +74,7 @@ public class Cash {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cash cash1 = (Cash) o;
-        return minNotesAndCoins == cash1.minNotesAndCoins &&
-                Arrays.equals(denominations, cash1.denominations) &&
-                minCashCounts.equals(cash1.minCashCounts) &&
-                Objects.equals(cash, cash1.cash);
+        return Objects.equals(cash, cash1.cash);
     }
 
     private void initCash(BigDecimal amount) {
@@ -86,30 +82,40 @@ public class Cash {
             return;
         }
 
-        countCash(amount, new ArrayList<>(), 0, 0);
+        List<Integer> minCashCounts = countCash(amount, new ArrayList<>(), 0, 0);
+        if (minCashCounts == null) {
+            throw new IllegalArgumentException("amount cannot be converted to cash");
+        }
+
+        for (int i = 0; i < minCashCounts.size(); i++) {
+            if (minCashCounts.get(i) == 0) {
+                continue;
+            }
+            cash.put(denominations[i], minCashCounts.get(i));
+        }
     }
 
-    private void countCash(BigDecimal amount, List<Integer> cashCounts, int currDominationIndex, int totalCount) {
+    private static List<Integer> countCash(BigDecimal amount, List<Integer> cashCounts, int currDominationIndex, int totalCount) {
         if (currDominationIndex == denominations.length) {
-            if (amount.compareTo(new BigDecimal(0)) == 0) {
-                if (totalCount < minNotesAndCoins) {
-                    minNotesAndCoins = totalCount;
-                    minCashCounts = new ArrayList<>(cashCounts);
-                }
+            if (areCloseEnough(amount, new BigDecimal(0), ONE_CENT, false)) {
+                return new ArrayList<>(cashCounts);
             }
-            return;
         }
 
         BigDecimal domination = denominations[currDominationIndex].getValue();
         int maxCount = amount.divide(domination, RoundingMode.DOWN).intValue();
-        for (int count = 0; count <= maxCount; count++) {
+        for (int count = maxCount; count >=0 ; count--) {
             cashCounts.add(count);
-            countCash(amount.subtract(domination.multiply(new BigDecimal(count))),
+            List<Integer> solution = countCash(amount.subtract(domination.multiply(new BigDecimal(count))),
                     cashCounts,
                     currDominationIndex + 1,
                     totalCount + count);
             cashCounts.remove(cashCounts.size() - 1);
+            if (solution != null) {
+                return solution;
+            }
         }
+        return null;
     }
 }
 

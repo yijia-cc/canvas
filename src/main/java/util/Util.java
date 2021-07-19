@@ -1,11 +1,13 @@
 package util;
 
+import java.math.BigDecimal;
+
 public class Util {
-    public static boolean areCloseEnough(double num1, double num2, double error, boolean includeEqual) {
+    public static boolean areCloseEnough(BigDecimal num1, BigDecimal num2, BigDecimal error, boolean includeEqual) {
         if (includeEqual) {
-            return (Math.abs(num1 - num2) <= error);
+            return num1.subtract(num2).abs().compareTo(error) <= 0;
         } else {
-            return (Math.abs(num1 - num2) < error);
+            return num1.subtract(num2).abs().compareTo(error) < 0;
         }
     }
 }
