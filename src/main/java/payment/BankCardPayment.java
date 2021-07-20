@@ -1,29 +1,28 @@
 package payment;
 
 import bank.PaymentService;
-import bank.card.CreditCard;
+import bank.card.BankCard;
 import exceptions.InsufficientFundException;
 
 import java.math.BigDecimal;
 import java.util.concurrent.TimeoutException;
 
-public class CreditCardPayment implements PaymentMethod {
-
+public class BankCardPayment implements PaymentMethod {
     private final PaymentService paymentService;
-    private final CreditCard creditCard;
+    private final BankCard bankCard;
 
-    public CreditCardPayment(PaymentService paymentService, CreditCard creditCard) {
+    public BankCardPayment(PaymentService paymentService, BankCard bankCard) {
         this.paymentService = paymentService;
-        this.creditCard = creditCard;
+        this.bankCard = bankCard;
     }
 
     @Override
     public boolean isAuthorized() throws TimeoutException {
-        return paymentService.verifyCreditCard(creditCard);
+        return paymentService.verifyBankCard(bankCard);
     }
 
     @Override
     public boolean pay(BigDecimal totalAmountToPay) throws InsufficientFundException {
-        return paymentService.payWithCreditCard(creditCard, totalAmountToPay);
+        return paymentService.payWithBankCard(bankCard, totalAmountToPay);
     }
 }

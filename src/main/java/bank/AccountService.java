@@ -3,8 +3,8 @@ package bank;
 import bank.account.Account;
 import bank.account.AccountType;
 import bank.alert.Alert;
-import bank.card.BankCard;
-import bank.card.BankCardType;
+import bank.card.CreditCard;
+import bank.card.DebitCard;
 import bank.transaction.Transaction;
 import bank.user.User;
 import cash.Cash;
@@ -23,7 +23,8 @@ public interface AccountService {
 
     List<Transaction> viewTransactions(Account account);
 
-    BankCard requestBankCard(Account account, BankCardType bankCardType);
+    DebitCard requestCreditCard(DebitCardRequest request);
+    CreditCard requestDebitCard(CreditCardRequest request);
 
     void setUpAlert(Account account, Alert alert);
 
