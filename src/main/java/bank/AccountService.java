@@ -23,8 +23,9 @@ public interface AccountService {
 
     List<Transaction> viewTransactions(Account account);
 
-    DebitCard requestCreditCard(DebitCardRequest request);
-    CreditCard requestDebitCard(CreditCardRequest request);
+    CreditCard requestCreditCard(CreditCardRequest request);
+
+    DebitCard requestDebitCard(DebitCardRequest request);
 
     void setUpAlert(Account account, Alert alert);
 

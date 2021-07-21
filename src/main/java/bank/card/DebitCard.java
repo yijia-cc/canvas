@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Getter
@@ -15,12 +16,12 @@ public class DebitCard extends BankCard {
 
     public DebitCard(
             Name cardHolderName,
-            int[] cardNumber,
+            BigInteger cardNumber,
             LocalDate validThrough,
-            int[] cardVerificationValue,
+            int cardVerificationValue,
             CardNetwork cardNetwork,
             String issuer,
-            int[] accountNumber) {
+            BigInteger accountNumber) {
         super(cardHolderName, cardNumber, validThrough, cardVerificationValue, cardNetwork, issuer, accountNumber);
     }
 }

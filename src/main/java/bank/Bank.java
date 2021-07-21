@@ -8,15 +8,17 @@ import bank.card.*;
 import bank.transaction.Transaction;
 import bank.user.*;
 import cash.Cash;
+import id.IdGenerator;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.Period;
+import java.math.BigInteger;
+import java.time.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
-import static util.Util.generateRandomNumber;
+import static util.Util.generateRandomNumbers;
 
 /**
  * @author yijia-cc
@@ -42,14 +44,33 @@ public class Bank implements AuthenticationService, AccountService, PaymentServi
     private static final CardNetwork DEFAULT_CARD_NETWORK = CardNetwork.VISA;
     private static final String BANK_NAME = "Future Digital";
 
+    private final Random random;
+    private final Clock clock;
+
     // Key: accountId, Value: Account
     private final Map<String, User> users = new HashMap<>();
     private final Map<String, Account> accounts = new HashMap<>();
     private final Map<String, BankCard> bankCards = new HashMap<>();
 
-    private final IdGenerator userIdGenerator = new IdGenerator(0, USER_ID_LENGTH);
-    private final IdGenerator accountIdGenerator =  new IdGenerator(0, ACCOUNT_ID_LENGTH);
-    private final IdGenerator cardNumberGenerator = new IdGenerator(0, CARD_NUMBER_LENGTH);
+    private final IdGenerator userIdGenerator = new IdGenerator(
+            new BigInteger(String.valueOf((long) Math.pow(10, USER_ID_LENGTH - 1))),
+            USER_ID_LENGTH);
+    private final IdGenerator accountIdGenerator =  new IdGenerator(
+            new BigInteger(String.valueOf((long) Math.pow(10, ACCOUNT_ID_LENGTH - 1))),
+            ACCOUNT_ID_LENGTH);
+    private final IdGenerator cardNumberGenerator = new IdGenerator(
+            new BigInteger(String.valueOf((long) Math.pow(10, CARD_NUMBER_LENGTH - 1))),
+            CARD_NUMBER_LENGTH);
+
+    Bank(Random random, Clock clock) {
+        this.random = random;
+        this.clock = clock;
+    }
+
+    public Bank() {
+        this.random = new Random();
+        this.clock = Clock.systemDefaultZone();
+    }
 
     @Override
     public Account openAccount(AccountType accountType) {
@@ -77,14 +98,18 @@ public class Bank implements AuthenticationService, AccountService, PaymentServi
     }
 
     @Override
-    public DebitCard requestCreditCard(DebitCardRequest request) {
-        int[] cardNumber = cardNumberGenerator.nextUniqueId();
-        LocalDate today = LocalDate.now();
+    public CreditCard requestCreditCard(CreditCardRequest request) {
+        if (request == null || request.account == null || request.cardHolderName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        BigInteger cardNumber = cardNumberGenerator.nextUniqueId();
+        LocalDate today = LocalDate.now(clock);
         Period cardValidPeriod = decideCardValidPeriod(request.account, BankCardType.CREDIT_CARD);
         LocalDate expiredAt = today.plus(cardValidPeriod);
-        int[] cardVerificationValue = generateRandomNumber(CVV_LENGTH, 0, 9);
+        int cardVerificationValue = generateRandomNumbers(random, CVV_LENGTH);
 
-        return new DebitCard(
+        return new CreditCard(
                 request.cardHolderName,
                 cardNumber,
                 expiredAt,
@@ -95,7 +120,7 @@ public class Bank implements AuthenticationService, AccountService, PaymentServi
     }
 
     @Override
-    public CreditCard requestDebitCard(CreditCardRequest request) {
+    public DebitCard requestDebitCard(DebitCardRequest request) {
         throw new UnsupportedOperationException();
     }
 
@@ -160,6 +185,6 @@ public class Bank implements AuthenticationService, AccountService, PaymentServi
     }
 
     private Period decideCardValidPeriod(Account account, BankCardType bankCardType) {
-        throw new UnsupportedOperationException();
+        return Period.of(3,0,0);
     }
 }

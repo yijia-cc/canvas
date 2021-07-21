@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Random;
 
 public class Util {
-    private static final Random RANDOM = new Random();
 
     public static boolean areCloseEnough(BigDecimal num1, BigDecimal num2, BigDecimal error, boolean includeEqual) {
         int compared = num1.subtract(num2).abs().compareTo(error);
@@ -16,15 +15,42 @@ public class Util {
         }
     }
 
-    public static int[] generateRandomNumber(int length, int min, int max) {
+    public static int generateRandomNumbers(Random random, int length) {
         if (length == 0) {
-            return new int[0];
+           throw new IllegalArgumentException("length must be at least 1");
         }
 
-        int[] randomNumbers = new int[length];
-        for (int i = 0; i < length; i++) {
-            randomNumbers[i] = min + RANDOM.nextInt(max - min + 1);
+        if (length > 9) {
+            throw new IllegalArgumentException("length must be less than 9");
         }
-        return randomNumbers;
+
+        int base = 10;
+
+        int min = lengthMin(base, length);
+        int max = lengthMax(base, length);
+        int addition = random.nextInt(max - min + 1);
+        return (int) Math.floor(addition + min);
+    }
+
+    public static int lengthMin(int base, int length) {
+        if (length == 0) {
+            throw new IllegalArgumentException("length must be at least 1");
+        }
+
+        if (length > 9) {
+            throw new IllegalArgumentException("length must be less than 9");
+        }
+        return (int)Math.pow(base, length - 1);
+    }
+
+    public static int lengthMax(int base, int length) {
+        if (length == 0) {
+            throw new IllegalArgumentException("length must be at least 1");
+        }
+
+        if (length > 9) {
+            throw new IllegalArgumentException("length must be less than 9");
+        }
+        return (int) Math.pow(base, length) - 1;
     }
 }
