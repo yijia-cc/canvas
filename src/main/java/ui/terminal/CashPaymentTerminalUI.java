@@ -1,7 +1,7 @@
 package ui.terminal;
 
+import payment.CashPayment;
 import payment.PaymentMethod;
-import payment.cash.CashPayment;
 import ui.PaymentUI;
 
 import java.math.BigDecimal;

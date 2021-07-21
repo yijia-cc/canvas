@@ -1,10 +1,10 @@
-package payment.cash;
+package payment;
 
+import cash.Cash;
 import exceptions.InsufficientFundException;
-import exceptions.PaymentTimeoutException;
-import payment.PaymentMethod;
 
 import java.math.BigDecimal;
+import java.util.concurrent.TimeoutException;
 
 public class CashPayment implements PaymentMethod {
     private BigDecimal balance;
@@ -14,12 +14,12 @@ public class CashPayment implements PaymentMethod {
     }
 
     @Override
-    public boolean isAuthorized() throws PaymentTimeoutException {
+    public boolean isAuthorized() throws TimeoutException {
         return true;
     }
 
     @Override
-    public boolean pay(BigDecimal totalAmountToPay) throws InsufficientFundException, PaymentTimeoutException {
+    public boolean pay(BigDecimal totalAmountToPay) throws InsufficientFundException {
         if (balance.compareTo(new BigDecimal(0)) == 0) {
             throw new InsufficientFundException();
         }

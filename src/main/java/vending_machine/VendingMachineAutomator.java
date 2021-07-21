@@ -1,12 +1,16 @@
 package vending_machine;
 
-import exceptions.*;
+import exceptions.InsufficientFundException;
+import exceptions.InsufficientInventoryException;
+import exceptions.NoInventorySelectedException;
+import exceptions.NoPaymentMethodException;
 import payment.PaymentMethod;
 import retry.RetryStrategy;
 import ui.VendingMachineUI;
 
 import java.util.List;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VendingMachineAutomator {
@@ -69,11 +73,11 @@ public class VendingMachineAutomator {
             try {
                 item = vendingMachine.makePurchase();
             } catch (InsufficientFundException |
-                    PaymentTimeoutException |
+                    TimeoutException |
                     InsufficientInventoryException |
                     NoInventorySelectedException |
                     NoPaymentMethodException e) {
-                vendingMachineUI.displayPaymentError(e);
+                vendingMachineUI.displayPurchaseError(e);
                 cancelTransaction();
                 continue;
             }

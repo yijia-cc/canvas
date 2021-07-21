@@ -14,6 +14,7 @@ import payment.PaymentMethod;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -231,8 +232,8 @@ public class VendingMachineTest {
                             add(new Inventory("003", "Kind", new BigDecimal("2")));
                         }},
                         false,
-                        PaymentTimeoutException.class,
-                        PaymentTimeoutException.class),
+                        TimeoutException.class,
+                        TimeoutException.class),
                 arguments(
                         "Authorized",
                         new ArrayList<>() {{
@@ -334,8 +335,8 @@ public class VendingMachineTest {
                         }},
                         "001",
                         true,
-                        PaymentTimeoutException.class,
-                        PaymentTimeoutException.class,
+                        TimeoutException.class,
+                        TimeoutException.class,
                         null
                 ),
                 arguments(

@@ -1,4 +1,4 @@
-package payment.cash;
+package cash;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,7 +24,7 @@ public class Cash {
     };
     private final Map<Denomination, Integer> cash = new HashMap<>();
 
-    Cash(BigDecimal amount) {
+    public Cash(BigDecimal amount) {
         if (amount.compareTo(new BigDecimal(0)) < 0) {
             throw new IllegalArgumentException("amount cannot be negative");
         }
@@ -77,6 +77,29 @@ public class Cash {
         return Objects.equals(cash, cash1.cash);
     }
 
+    private static List<Integer> countCash(BigDecimal amount, List<Integer> cashCounts, int currDominationIndex, int totalCount) {
+        if (currDominationIndex == denominations.length) {
+            if (areCloseEnough(amount, new BigDecimal(0), ONE_CENT, false)) {
+                return new ArrayList<>(cashCounts);
+            }
+        }
+
+        BigDecimal domination = denominations[currDominationIndex].getValue();
+        int maxCount = amount.divide(domination, RoundingMode.DOWN).intValue();
+        for (int count = maxCount; count >= 0; count--) {
+            cashCounts.add(count);
+            List<Integer> solution = countCash(amount.subtract(domination.multiply(new BigDecimal(count))),
+                    cashCounts,
+                    currDominationIndex + 1,
+                    totalCount + count);
+            cashCounts.remove(cashCounts.size() - 1);
+            if (solution != null) {
+                return solution;
+            }
+        }
+        return null;
+    }
+
     private void initCash(BigDecimal amount) {
         if (amount.compareTo(new BigDecimal(0)) == 0) {
             return;
@@ -93,29 +116,6 @@ public class Cash {
             }
             cash.put(denominations[i], minCashCounts.get(i));
         }
-    }
-
-    private static List<Integer> countCash(BigDecimal amount, List<Integer> cashCounts, int currDominationIndex, int totalCount) {
-        if (currDominationIndex == denominations.length) {
-            if (areCloseEnough(amount, new BigDecimal(0), ONE_CENT, false)) {
-                return new ArrayList<>(cashCounts);
-            }
-        }
-
-        BigDecimal domination = denominations[currDominationIndex].getValue();
-        int maxCount = amount.divide(domination, RoundingMode.DOWN).intValue();
-        for (int count = maxCount; count >=0 ; count--) {
-            cashCounts.add(count);
-            List<Integer> solution = countCash(amount.subtract(domination.multiply(new BigDecimal(count))),
-                    cashCounts,
-                    currDominationIndex + 1,
-                    totalCount + count);
-            cashCounts.remove(cashCounts.size() - 1);
-            if (solution != null) {
-                return solution;
-            }
-        }
-        return null;
     }
 }
 
