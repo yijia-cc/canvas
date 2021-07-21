@@ -99,7 +99,9 @@ public class Bank implements AuthenticationService, AccountService, PaymentServi
 
     @Override
     public CreditCard requestCreditCard(CreditCardRequest request) {
-        if (request == null || request.account == null || request.cardHolderName == null) {
+        if (request == null || 
+            request.account == null || 
+            request.cardHolderName == null) {
             throw new IllegalArgumentException();
         }
 
