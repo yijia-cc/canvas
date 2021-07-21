@@ -16,5 +16,4 @@ public interface AuthenticationService {
     User verifyIdentity(Credential credential);
 
     boolean verifyUser(User user, GovernmentId governmentId);
-
 }
